@@ -20,7 +20,7 @@ void main() {
 
     expect(find.text('Saniya'), findsOneWidget);
     expect(find.text(greeting), findsOneWidget);
-    expect(find.text("Goal's"), findsOneWidget);
+    expect(find.text("GOAL'S"), findsOneWidget);
     expect(find.text('No Goals Yet'), findsOneWidget);
     expect(find.text('Home'), findsWidgets);
   });

@@ -40,7 +40,10 @@ class _JournalTeaserCardState extends State<JournalTeaserCard> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final h = constraints.maxWidth / AppConstants.journalAspect;
+        final h =
+            constraints.maxHeight.isFinite
+                ? constraints.maxHeight
+                : constraints.maxWidth / AppConstants.journalAspect;
         // The shell keeps every tab alive. page_flip stores its pages in
         // globals, so the offstage Journal tab must not mount a second one.
         final active = TickerMode.of(context);
@@ -131,7 +134,7 @@ class _CoverFace extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   style: const TextStyle(
-                    fontFamily: 'Arvo',
+                    fontFamily: AppConstants.arvo,
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     height: 1,
@@ -189,7 +192,7 @@ class _OpenJournalPage extends StatelessWidget {
                 const Text(
                   'Your Thoughts\nDeserves A Place',
                   style: TextStyle(
-                    fontFamily: 'Geist',
+                    fontFamily: AppConstants.geist,
                     fontWeight: FontWeight.w700,
                     fontSize: 26,
                     height: 1.15,
@@ -201,7 +204,7 @@ class _OpenJournalPage extends StatelessWidget {
                 const Text(
                   'Start Your First Entry And Begin Your\nJournalising Journey Today',
                   style: TextStyle(
-                    fontFamily: 'Satoshi',
+                    fontFamily: AppConstants.satoshi,
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                     height: 1.35,
@@ -253,7 +256,7 @@ class _OpenJournalPage extends StatelessWidget {
                               Text(
                                 'Write Your Frist Entry',
                                 style: TextStyle(
-                                  fontFamily: 'Satoshi',
+                                  fontFamily: AppConstants.satoshi,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13,
                                   color: AppColors.white,

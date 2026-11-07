@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_typography.dart';
@@ -27,7 +28,16 @@ class HomePage extends StatelessWidget {
         final horoscope = state.horoscope;
         final topPadding = MediaQuery.paddingOf(context).top;
         final width = MediaQuery.sizeOf(context).width;
-        final headerHeight = topPadding + (width * 1.05).clamp(380.0, 460.0);
+        // Figma sheet: top 406, radius 24. Column: top 440, left 26, width 352, gap 37.
+        const sheetTop = 406.0;
+        const sheetRadius = 24.0;
+        const contentTop = 440.0;
+        const sectionGap = 37.0;
+        const headerToCard = 16.0;
+        final sx = width / 402;
+        final contentLeft = 26 * sx;
+        final contentRight = 24 * sx;
+        final headerHeight = sheetTop + sheetRadius;
         final hour = DateTime.now().hour;
         final greeting =
             hour < 12
@@ -87,31 +97,55 @@ class HomePage extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        greeting,
-                                        style: AppTypography.body(
-                                          size: 14,
-                                          color: AppColors.greetingMuted,
+                                      SizedBox(
+                                        height: 18,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            greeting,
+                                            style: TextStyle(
+                                              fontFamily: AppConstants.satoshi,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                              height: 1.29,
+                                              letterSpacing: 12 * -0.02,
+                                              color: AppColors.greetingMuted,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        user.name,
-                                        style: AppTypography.title(
-                                          size: 32,
-                                          weight: FontWeight.w700,
-                                          color: AppColors.white,
-                                          height: 1.1,
+                                      SizedBox(
+                                        height: 31,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            user.name,
+                                            style: const TextStyle(
+                                              fontFamily: AppConstants.geist,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 24,
+                                              height: 1.29,
+                                              letterSpacing: 24 * -0.02,
+                                              color: AppColors.headerName,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        user.traitsLine,
-                                        style: AppTypography.label(
-                                          size: 12,
-                                          weight: FontWeight.w400,
-                                          color: AppColors.cyanMuted,
-                                          letterSpacing: 0.2,
+                                      SizedBox(
+                                        height: 16,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            user.traitsLine,
+                                            style: TextStyle(
+                                              fontFamily: AppConstants.satoshi,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              height: 1.29,
+                                              letterSpacing: 12 * -0.02,
+                                              color: AppColors.headerTraits,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -151,7 +185,7 @@ class HomePage extends StatelessWidget {
                               child: IgnorePointer(
                                 child: ZodiacTimerLabels(
                                   config: config,
-                                  chordY: headerHeight - 40,
+                                  chordY: sheetTop - 16,
                                 ),
                               ),
                             );
@@ -162,12 +196,12 @@ class HomePage extends StatelessWidget {
                           left: 0,
                           right: 0,
                           bottom: 0,
-                          height: 28,
+                          height: sheetRadius,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               color: AppColors.white,
                               borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(24),
+                                top: Radius.circular(sheetRadius),
                               ),
                             ),
                           ),
@@ -181,71 +215,88 @@ class HomePage extends StatelessWidget {
                 child: ColoredBox(
                   color: AppColors.white,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 100),
+                    padding: EdgeInsets.fromLTRB(
+                      contentLeft,
+                      0, // contentTop - headerHeight,
+                      contentRight,
+                      100,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const FadeSlideIn(
-                                delay: Duration(milliseconds: 140),
-                                child: SectionHeader(title: "GOAL'S"),
-                              ),
-                              const SizedBox(height: 10),
-                              FadeSlideIn(
-                                delay: const Duration(milliseconds: 180),
-                                child: GoalsEmptyCard(
-                                  onCreate: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Create Goal — UI only'),
-                                      ),
-                                    );
-                                  },
+                        const FadeSlideIn(
+                          delay: Duration(milliseconds: 140),
+                          child: SectionHeader(title: "GOAL'S", opacity: 0.45),
+                        ),
+                        const SizedBox(height: headerToCard),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 180),
+                          child: GoalsEmptyCard(
+                            onCreate: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Create Goal — UI only'),
                                 ),
-                              ),
-                              const SizedBox(height: 28),
-                              const FadeSlideIn(
-                                delay: Duration(milliseconds: 220),
-                                child: SectionHeader(
-                                  title: "TODAY'S HOROSCOPE",
-                                ),
-                              ),
-                              // Figma: card top 37 → header 21 + gap 16
-                              //const SizedBox(height: 16),
-                              FadeSlideIn(
-                                delay: const Duration(milliseconds: 260),
-                                child: HoroscopeCard(horoscope: horoscope),
-                              ),
-                              const SizedBox(height: 28),
-                              const FadeSlideIn(
-                                delay: Duration(milliseconds: 300),
-                                child: SectionHeader(
-                                  title: "TODAY'S NUMEROLOGY",
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              FadeSlideIn(
-                                delay: const Duration(milliseconds: 340),
-                                child: NumerologyCard(
-                                  luckyNumber: horoscope.luckyNumber,
-                                ),
-                              ),
-                              const SizedBox(height: 28),
-                              const FadeSlideIn(
-                                delay: Duration(milliseconds: 380),
-                                child: SectionHeader(title: 'YOUR JOURNAL'),
-                              ),
-                              // Figma: card top 37 → header 21 + gap 16
-                              const SizedBox(height: 16),
-                              FadeSlideIn(
-                                delay: const Duration(milliseconds: 420),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: sectionGap),
+                        const FadeSlideIn(
+                          delay: Duration(milliseconds: 220),
+                          child: SectionHeader(
+                            title: "TODAY'S HOROSCOPE",
+                            opacity: 0.45,
+                            height: 21,
+                          ),
+                        ),
+                        //const SizedBox(height: headerToCard),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 260),
+                          child: HoroscopeCard(horoscope: horoscope),
+                        ),
+                        const SizedBox(height: sectionGap),
+                        const FadeSlideIn(
+                          delay: Duration(milliseconds: 300),
+                          child: SectionHeader(
+                            title: "TODAY'S NUMEROLOGY",
+                            opacity: 0.45,
+                            height: 21,
+                          ),
+                        ),
+                        const SizedBox(height: headerToCard),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 340),
+                          child: NumerologyCard(
+                            luckyNumber: horoscope.luckyNumber,
+                          ),
+                        ),
+                        const SizedBox(height: sectionGap),
+                        const FadeSlideIn(
+                          delay: Duration(milliseconds: 380),
+                          child: SectionHeader(
+                            title: 'YOUR JOURNAL',
+                            opacity: 0.45,
+                            height: 21,
+                          ),
+                        ),
+                        const SizedBox(height: headerToCard),
+                        FadeSlideIn(
+                          delay: const Duration(milliseconds: 420),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 462 * sx,
+                            child: OverflowBox(
+                              alignment: Alignment.centerLeft,
+                              minWidth: 363 * sx,
+                              maxWidth: 363 * sx,
+                              minHeight: 462 * sx,
+                              maxHeight: 462 * sx,
+                              child: Transform.translate(
+                                offset: Offset(-11 * sx, 0),
                                 child: JournalTeaserCard(ownerName: user.name),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
@@ -284,7 +335,12 @@ class _RoundIcon extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(asset, width: 22, height: 22, fit: BoxFit.contain),
+      child: SvgPicture.asset(
+        asset,
+        width: 22,
+        height: 22,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }

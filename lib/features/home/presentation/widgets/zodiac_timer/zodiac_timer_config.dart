@@ -32,9 +32,9 @@ class ZodiacTimerConfig {
     ),
     ZodiacRingSpec(
       color: AppColors.dialMmFill,
-      min: 0,
-      max: 11,
-      selected: 9,
+      min: 1,
+      max: 12,
+      selected: 1,
       fontSize: 17,
       selectedFontSize: 19,
       mutedColor: AppColors.dialMmMuted,

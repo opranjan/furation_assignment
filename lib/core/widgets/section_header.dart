@@ -1,46 +1,44 @@
 import 'package:flutter/material.dart';
+import '../constants/app_constants.dart';
 import '../theme/app_colors.dart';
 
-/// Section label row — Figma: Geist SemiBold 16 / space-between / opacity 0.45.
+/// Section label row — Geist SemiBold 16, uppercase, #141414.
 class SectionHeader extends StatelessWidget {
-  const SectionHeader({super.key, required this.title, this.trailing});
+  const SectionHeader({
+    super.key,
+    required this.title,
+    this.trailing,
+    this.opacity = 1,
+    this.height = 16 * 1.29,
+  });
 
   final String title;
   final Widget? trailing;
-
-  /// CSS text-transform: capitalize
-  static String _capitalize(String value) {
-    return value
-        .split(RegExp(r'\s+'))
-        .map((word) {
-          if (word.isEmpty) return word;
-          return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
-        })
-        .join(' ');
-  }
+  final double opacity;
+  final double height;
 
   static const _style = TextStyle(
-    fontFamily: 'Geist',
+    fontFamily: AppConstants.geist,
     fontWeight: FontWeight.w600,
     fontSize: 16,
     height: 1.29,
     letterSpacing: 16 * -0.02,
-    color: AppColors.black,
+    color: AppColors.sectionTitle,
   );
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 21,
+      height: height,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            _capitalize(title),
+            title.toUpperCase(),
             style: _style.copyWith(
-              color: AppColors.black.withValues(alpha: 0.45),
+              color: AppColors.sectionTitle.withValues(alpha: opacity),
             ),
           ),
           if (trailing != null) trailing!,

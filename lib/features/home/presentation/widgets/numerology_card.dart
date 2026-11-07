@@ -6,39 +6,51 @@ import '../../../../core/theme/app_colors.dart';
 
 /// Today's Numerology — cream number-pattern bg + orb (Figma).
 class NumerologyCard extends StatelessWidget {
-  const NumerologyCard({super.key, required this.luckyNumber});
+  const NumerologyCard({
+    super.key,
+    required this.luckyNumber,
+    this.fadeBottom = false,
+  });
 
   final int luckyNumber;
+
+  /// Softens the lower edge. Used on Insights only; Home stays a solid card.
+  final bool fadeBottom;
 
   @override
   Widget build(BuildContext context) {
     const radius = 28.0;
 
-    return AspectRatio(
+    final card = AspectRatio(
       aspectRatio: 349 / 368,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius),
-          // border-image: linear-gradient(360deg, #FCF6DE → #CFC7A9)
-          gradient: const LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              AppColors.numerologyBorder,
-              AppColors.numerologyBorderLight,
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(1.2),
+        decoration:
+            fadeBottom
+                ? null
+                : BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  // border-image: linear-gradient(360deg, #FCF6DE → #CFC7A9)
+                  gradient: const LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      AppColors.numerologyBorder,
+                      AppColors.numerologyBorderLight,
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.08),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+        padding: EdgeInsets.all(fadeBottom ? 0 : 1.2),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(radius - 1.2),
+          borderRadius: BorderRadius.circular(
+            fadeBottom ? radius : radius - 1.2,
+          ),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -48,13 +60,13 @@ class NumerologyCard extends StatelessWidget {
                 filterQuality: FilterQuality.high,
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+                padding: EdgeInsets.fromLTRB(22, 18, 22, fadeBottom ? 56 : 20),
                 child: Column(
                   children: [
                     const Text(
                       'Lucky Number',
                       style: TextStyle(
-                        fontFamily: 'Satoshi',
+                        fontFamily: AppConstants.satoshi,
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                         height: 1.29,
@@ -70,7 +82,7 @@ class NumerologyCard extends StatelessWidget {
                       child: Text(
                         "Today's guidance:",
                         style: TextStyle(
-                          fontFamily: 'Geist',
+                          fontFamily: AppConstants.geist,
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                           height: 1.29,
@@ -83,7 +95,7 @@ class NumerologyCard extends StatelessWidget {
                     const Text(
                       'Stay open to unexpected opportunities. Trust your instincts, explore something new, and avoid overthinking your next move.',
                       style: TextStyle(
-                        fontFamily: 'Satoshi',
+                        fontFamily: AppConstants.satoshi,
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                         height: 1.38,
@@ -98,6 +110,19 @@ class NumerologyCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+    if (!fadeBottom) return card;
+    return ShaderMask(
+      blendMode: BlendMode.dstIn,
+      shaderCallback: (rect) {
+        return const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+          stops: [0, 0.82, 1],
+        ).createShader(rect);
+      },
+      child: card,
     );
   }
 }
@@ -536,7 +561,7 @@ class _GlobePainter extends CustomPainter {
               fontSize: r * 1.05,
               fontWeight: FontWeight.w300,
               height: 1,
-              fontFamily: 'Geist',
+              fontFamily: AppConstants.geist,
               shadows: [
                 Shadow(
                   color: AppColors.black.withValues(alpha: 0.25),

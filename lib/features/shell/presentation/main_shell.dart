@@ -1,31 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
+import 'journal_open_overlay.dart';
 
-class MainShell extends StatelessWidget {
+class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  bool _openingJournal = false;
+
   void _select(AppTab tab) {
-    navigationShell.goBranch(
+    if (_openingJournal) return;
+    final openingJournal =
+        tab == AppTab.journal &&
+        widget.navigationShell.currentIndex != AppTab.journal.index;
+    if (openingJournal) {
+      setState(() => _openingJournal = true);
+      widget.navigationShell.goBranch(AppTab.journal.index);
+      return;
+    }
+    widget.navigationShell.goBranch(
       tab.index,
-      initialLocation: tab.index == navigationShell.currentIndex,
+      initialLocation: tab.index == widget.navigationShell.currentIndex,
     );
+  }
+
+  void _finishJournalOpen() {
+    if (!mounted) return;
+    setState(() => _openingJournal = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final current = AppTab.values[navigationShell.currentIndex];
-    return Scaffold(
-      // Dark so Home Goals sheet 24px top corners aren’t filled by white
-      backgroundColor: AppColors.headerBottom,
-      body: navigationShell,
-      bottomNavigationBar: _BottomNav(current: current, onSelect: _select),
+    final current = AppTab.values[widget.navigationShell.currentIndex];
+    return Stack(
+      children: [
+        Scaffold(
+          // Dark so Home Goals sheet 24px top corners aren’t filled by white
+          backgroundColor: AppColors.headerBottom,
+          body: widget.navigationShell,
+          bottomNavigationBar: _BottomNav(current: current, onSelect: _select),
+        ),
+        if (_openingJournal)
+          Positioned.fill(
+            child: JournalOpenOverlay(onFinished: _finishJournalOpen),
+          ),
+      ],
     );
   }
 }
@@ -60,33 +90,28 @@ class _BottomNav extends StatelessWidget {
               _NavItem(
                 tab: AppTab.home,
                 label: 'Home',
-                icon: Icons.home_outlined,
-                selectedIcon: Icons.home_rounded,
+                icon: AppConstants.navHome,
                 selected: current == AppTab.home,
                 onTap: onSelect,
-                showStar: true,
               ),
               _NavItem(
                 tab: AppTab.goals,
                 label: 'Goals',
-                icon: Icons.gps_fixed_rounded,
-                selectedIcon: Icons.gps_fixed_rounded,
+                icon: AppConstants.navGoals,
                 selected: current == AppTab.goals,
                 onTap: onSelect,
               ),
               _NavItem(
                 tab: AppTab.journal,
                 label: 'Journal',
-                icon: Icons.auto_stories_outlined,
-                selectedIcon: Icons.auto_stories_rounded,
+                icon: AppConstants.navJournal,
                 selected: current == AppTab.journal,
                 onTap: onSelect,
               ),
               _NavItem(
                 tab: AppTab.insights,
                 label: 'Insights',
-                icon: Icons.auto_awesome_outlined,
-                selectedIcon: Icons.auto_awesome,
+                icon: AppConstants.navInsights,
                 selected: current == AppTab.insights,
                 onTap: onSelect,
               ),
@@ -132,24 +157,30 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
+String _capitalize(String value) {
+  return value
+      .split(RegExp(r'\s+'))
+      .map((word) {
+        if (word.isEmpty) return word;
+        return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+      })
+      .join(' ');
+}
+
 class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.tab,
     required this.label,
     required this.icon,
-    required this.selectedIcon,
     required this.selected,
     required this.onTap,
-    this.showStar = false,
   });
 
   final AppTab tab;
   final String label;
-  final IconData icon;
-  final IconData selectedIcon;
+  final String icon;
   final bool selected;
   final ValueChanged<AppTab> onTap;
-  final bool showStar;
 
   @override
   Widget build(BuildContext context) {
@@ -163,37 +194,26 @@ class _NavItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
+                width: 26,
                 height: 26,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                      selected ? selectedIcon : icon,
-                      color: color,
-                      size: 24,
-                    ),
-                    if (showStar && selected)
-                      const Positioned(
-                        top: -2,
-                        right: -10,
-                        child: Icon(
-                          Icons.auto_awesome,
-                          size: 11,
-                          color: AppColors.starGold,
-                        ),
-                      ),
-                  ],
+                child: SvgPicture.asset(
+                  icon,
+                  fit: BoxFit.contain,
+                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                label,
-                style: AppTypography.label(
-                  size: 11,
-                  weight: selected ? FontWeight.w600 : FontWeight.w500,
+                _capitalize(label),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: AppConstants.geist,
+                  fontStyle: FontStyle.normal,
+                  fontSize: selected ? 12.25 : 12,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                   color: color,
-                  letterSpacing: 0.1,
+                  height: 1,
+                  letterSpacing: 0,
                 ),
               ),
             ],

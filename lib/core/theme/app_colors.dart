@@ -15,7 +15,11 @@ class AppColors {
   static const Color headerLift = Color(0xFF0B3034);
   static const Color headerMid = Color(0xFF071F22);
   static const Color headerBottom = Color(0xFF041416);
-  static const Color greetingMuted = Color(0xFFC5D4D3);
+  static const Color headerGradientTop = Color(0xFF144750);
+  static const Color headerGradientBottom = Color(0xFF081C20);
+  static const Color greetingMuted = Color(0xFFFEFDF8);
+  static const Color headerName = Color(0xFFE6E6E6);
+  static const Color headerTraits = Color(0xFFAEF2FF);
 
   // Brand teal
   static const Color primary = Color(0xFF0E6B66);
@@ -131,13 +135,18 @@ class AppColors {
   static const Color textOnDark = white;
   static const Color textOnDarkMuted = Color(0xFFB7C9C8);
   static const Color sectionLabel = Color(0xFF8A9391);
+  static const Color sectionTitle = Color(0xFF141414);
   static const Color journalHeading = Color(0xFF191919);
+  static const Color journalSubtitle = Color(0xFF333333);
   static const Color journalDate = Color(0xFF8E8E8E);
   static const Color journalMuted = Color(0xFF8A8A8A);
   static const Color bodyGray = Color(0xFF6A6A6A);
-  static const Color goalsSubtitle = Color(0xFF4A4A4A);
+  static const Color goalsSubtitle = Color(0xFF595959);
+  static const Color goalsTitle = Color(0xFF070707);
   static const Color numerologyBody = Color(0xFF2A2A2A);
   static const Color horoscopeBody = Color(0xFF6E6E6E);
+  static const Color horoscopeDate = Color(0x6EFFFFFF);
+  static const Color readMore = Color(0xFF94C6CF);
   static const Color signValue = Color(0xFF3A3A3A);
   static const Color textSoft = Color(0xFF9A9A9A);
   static const Color textFaint = Color(0xFFA3A3A3);

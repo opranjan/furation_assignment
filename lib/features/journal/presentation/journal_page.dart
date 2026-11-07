@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:page_flip/page_flip.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/di/injection.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/fade_slide_in.dart';
+import '../../home/domain/usecases/get_user.dart';
 import '../domain/entities/journal_entry.dart';
 import 'bloc/journal_bloc.dart';
 import '../../../core/theme/app_colors.dart';
@@ -42,27 +44,49 @@ class _JournalView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FadeSlideIn(
-                        child: Text(
-                          'Your Journal',
-                          style: const TextStyle(
-                            fontFamily: 'Geist',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 24,
-                            height: 1.29,
-                            letterSpacing: -0.48,
-                            color: AppColors.journalHeading,
+                      const FadeSlideIn(
+                        child: SizedBox(
+                          width: 143,
+                          height: 31,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Your Journal',
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontFamily: AppConstants.geist,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24,
+                                height: 1.29,
+                                letterSpacing: 24 * -0.02,
+                                color: AppColors.journalHeading,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      FadeSlideIn(
-                        delay: const Duration(milliseconds: 80),
-                        child: Text(
-                          'A Space To Be You',
-                          style: AppTypography.body(
-                            size: 15,
-                            color: AppColors.journalDate,
+                      const SizedBox(height: 3),
+                      const FadeSlideIn(
+                        delay: Duration(milliseconds: 80),
+                        child: SizedBox(
+                          width: 127,
+                          height: 21,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'A Space To Be You',
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontFamily: AppConstants.satoshi,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 16,
+                                height: 1.29,
+                                letterSpacing: 16 * -0.02,
+                                color: AppColors.journalSubtitle,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -85,7 +109,7 @@ class _JournalView extends StatelessWidget {
                             child: const Text(
                               'Recent Entries',
                               style: TextStyle(
-                                fontFamily: 'Geist',
+                                fontFamily: AppConstants.geist,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,
                                 color: AppColors.textPrimary,
@@ -110,7 +134,7 @@ class _JournalView extends StatelessWidget {
                             child: const Text(
                               '+ Add Entry',
                               style: TextStyle(
-                                fontFamily: 'Satoshi',
+                                fontFamily: AppConstants.satoshi,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 14,
                                 color: AppColors.journalAccent,
@@ -209,12 +233,14 @@ class _JournalCover extends StatefulWidget {
 class _JournalCoverState extends State<_JournalCover> {
   final _controller = PageFlipController();
   late final List<Widget> _pages;
+  late final String _ownerName;
   int _index = 0;
 
   @override
   void initState() {
     super.initState();
-    _pages = const [_CoverFace(), _JournalEntryPage()];
+    _ownerName = getIt<GetUser>()().name;
+    _pages = [_CoverFace(ownerName: _ownerName), const _JournalEntryPage()];
   }
 
   void _flip() {
@@ -275,7 +301,7 @@ class _JournalCoverState extends State<_JournalCover> {
                           ),
                         ],
                       )
-                      : const _CoverFace(),
+                      : _CoverFace(ownerName: _ownerName),
             ),
           ),
         );
@@ -285,17 +311,69 @@ class _JournalCoverState extends State<_JournalCover> {
 }
 
 class _CoverFace extends StatelessWidget {
-  const _CoverFace();
+  const _CoverFace({required this.ownerName});
+
+  final String ownerName;
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
+    return ColoredBox(
       color: AppColors.journalCover,
-      child: Image(
-        image: AssetImage(AppConstants.journalCover),
-        fit: BoxFit.cover,
-        alignment: Alignment.centerRight,
-        filterQuality: FilterQuality.high,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Book on a 402-wide screen with the page's 20px side padding.
+          final s = constraints.maxWidth / 362;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              const Image(
+                image: AssetImage(AppConstants.journalCover),
+                fit: BoxFit.cover,
+                alignment: Alignment.centerRight,
+                filterQuality: FilterQuality.high,
+              ),
+              Positioned(
+                top: 36 * s,
+                left: 95 * s,
+                width: 202 * s,
+                height: 44 * s,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(5 * s),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 11 * s,
+                        left: 16 * s,
+                        width: 169 * s,
+                        height: 21 * s,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "${ownerName.toUpperCase()}\u2019S JOURNAL",
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                              fontFamily: AppConstants.arvo,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 17 * s,
+                              height: 1,
+                              letterSpacing: 0,
+                              color: AppColors.journalPlate,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -332,7 +410,7 @@ class _JournalEntryPage extends StatelessWidget {
                 const Text(
                   'Page 1',
                   style: TextStyle(
-                    fontFamily: 'Satoshi',
+                    fontFamily: AppConstants.satoshi,
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                     height: 1.2,
@@ -343,7 +421,7 @@ class _JournalEntryPage extends StatelessWidget {
                 const Text(
                   '12th August, 12:35 PM',
                   style: TextStyle(
-                    fontFamily: 'Satoshi',
+                    fontFamily: AppConstants.satoshi,
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                     height: 1.2,
@@ -354,7 +432,7 @@ class _JournalEntryPage extends StatelessWidget {
                 const Text(
                   'A Day To Remember',
                   style: TextStyle(
-                    fontFamily: 'Geist',
+                    fontFamily: AppConstants.geist,
                     fontWeight: FontWeight.w700,
                     fontSize: 22,
                     height: 1.15,
@@ -365,7 +443,7 @@ class _JournalEntryPage extends StatelessWidget {
                 const Text(
                   'Today Felt Like A Good Day To Slow Down. I Finally Made Time For Something I Had Been Putting Off For A While To Pause, Breathe, And Simply Enjoy The Moment Without Rushing To The Next Thing....',
                   style: TextStyle(
-                    fontFamily: 'Satoshi',
+                    fontFamily: AppConstants.satoshi,
                     fontWeight: FontWeight.w400,
                     fontSize: 14,
                     height: 1.45,
@@ -389,7 +467,7 @@ class _JournalEntryPage extends StatelessWidget {
                       child: Text(
                         'Read More',
                         style: TextStyle(
-                          fontFamily: 'Satoshi',
+                          fontFamily: AppConstants.satoshi,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                           color: AppColors.white,
@@ -502,7 +580,7 @@ class _MonthChipsState extends State<_MonthChips> {
                       child: Text(
                         label,
                         style: TextStyle(
-                          fontFamily: 'Satoshi',
+                          fontFamily: AppConstants.satoshi,
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                           color:
@@ -576,7 +654,7 @@ class _EntryCard extends StatelessWidget {
                   Text(
                     day,
                     style: const TextStyle(
-                      fontFamily: 'Geist',
+                      fontFamily: AppConstants.geist,
                       fontWeight: FontWeight.w700,
                       fontSize: 26,
                       height: 1,
@@ -587,7 +665,7 @@ class _EntryCard extends StatelessWidget {
                   Text(
                     month,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
                       height: 1.1,
@@ -597,7 +675,7 @@ class _EntryCard extends StatelessWidget {
                   Text(
                     weekday,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
                       height: 1.2,
@@ -616,7 +694,7 @@ class _EntryCard extends StatelessWidget {
                     _capitalize(entry.title),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       height: 1,
@@ -630,7 +708,7 @@ class _EntryCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
                       height: 1.29,
@@ -642,7 +720,7 @@ class _EntryCard extends StatelessWidget {
                   Text(
                     entry.timeLabel,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w500,
                       fontSize: 12,
                       color: AppColors.entryHint,

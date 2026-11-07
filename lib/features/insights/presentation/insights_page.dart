@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,11 +33,6 @@ class _InsightsView extends StatelessWidget {
     final top = MediaQuery.paddingOf(context).top;
     final horoscope = state.horoscope;
 
-    // CSS linear-gradient(201.84deg, #D4E8EC 23.03%, #FEF2C2 85.7%)
-    final radians = 201.84 * math.pi / 180;
-    final dx = math.sin(radians);
-    final dy = -math.cos(radians);
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: ColoredBox(
@@ -45,56 +41,53 @@ class _InsightsView extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 28),
           physics: const BouncingScrollPhysics(),
           children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(-dx, -dy),
-                  end: Alignment(dx, dy),
-                  colors: const [AppColors.mintLight, AppColors.yellowLight],
-                  stops: const [0.2303, 0.857],
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+            ClipRect(
+              child: Stack(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(24.43, top + 12, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const FadeSlideIn(child: _Title()),
-                        const SizedBox(height: 18),
-                        const FadeSlideIn(
-                          delay: Duration(milliseconds: 60),
-                          child: _PeriodTabs(),
+                  const Positioned.fill(child: _InsightsBackground()),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(24.43, top + 12, 20, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const FadeSlideIn(child: _Title()),
+                            const SizedBox(height: 18),
+                            const FadeSlideIn(
+                              delay: Duration(milliseconds: 60),
+                              child: _PeriodTabs(),
+                            ),
+                            const SizedBox(height: 12),
+                            FadeSlideIn(
+                              delay: const Duration(milliseconds: 140),
+                              child: _ZodiacHero(
+                                name: state.displayName,
+                                birth: state.birthLabel,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        FadeSlideIn(
-                          delay: const Duration(milliseconds: 140),
-                          child: _ZodiacHero(
-                            name: state.displayName,
-                            birth: state.birthLabel,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const IgnorePointer(
-                    child: SizedBox(
-                      height: 72,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              AppColors.whiteTransparent,
-                              AppColors.white,
-                            ],
+                      ),
+                      const IgnorePointer(
+                        child: SizedBox(
+                          height: 72,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  AppColors.whiteTransparent,
+                                  AppColors.white,
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -114,8 +107,11 @@ class _InsightsView extends StatelessWidget {
                   const SizedBox(height: 22),
                   const _SectionLabel('NUMEROLOGY'),
                   const SizedBox(height: 14),
-                  NumerologyCard(luckyNumber: horoscope.luckyNumber),
-                  const SizedBox(height: 18),
+                  NumerologyCard(
+                    luckyNumber: horoscope.luckyNumber,
+                    fadeBottom: true,
+                  ),
+                  const SizedBox(height: 6),
                   _DestinyBlock(
                     number: state.destinyNumber,
                     title: state.destinyTitle,
@@ -130,6 +126,53 @@ class _InsightsView extends StatelessWidget {
   }
 }
 
+/// Header-only wash: linear-gradient(201.84deg, #D4E8EC 23.03%, #FEF2C2 85.7%)
+/// with a 116.6px blur. The rest of the page stays white.
+class _InsightsBackground extends StatelessWidget {
+  const _InsightsBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    const blur = 116.6;
+    final radians = 201.84 * math.pi / 180;
+    final dx = math.sin(radians);
+    final dy = -math.cos(radians);
+
+    return ClipRect(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth + blur * 2;
+          final height = constraints.maxHeight + blur * 2;
+          return OverflowBox(
+            maxWidth: width,
+            maxHeight: height,
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: blur / 2, sigmaY: blur / 2),
+              child: SizedBox(
+                width: width,
+                height: height,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment(-dx, -dy),
+                      end: Alignment(dx, dy),
+                      colors: const [
+                        AppColors.mintLight,
+                        AppColors.yellowLight,
+                      ],
+                      stops: const [0.2303, 0.857],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _Title extends StatelessWidget {
   const _Title();
 
@@ -138,7 +181,7 @@ class _Title extends StatelessWidget {
     return const Text(
       'Insights',
       style: TextStyle(
-        fontFamily: 'Geist',
+        fontFamily: AppConstants.geist,
         fontWeight: FontWeight.w600,
         fontSize: 20,
         height: 1,
@@ -275,7 +318,7 @@ class _PeriodTabBarState extends State<_PeriodTabBar> {
                       child: Text(
                         '·',
                         style: TextStyle(
-                          fontFamily: 'Satoshi',
+                          fontFamily: AppConstants.satoshi,
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                           height: 1,
@@ -291,7 +334,7 @@ class _PeriodTabBarState extends State<_PeriodTabBar> {
                       duration: const Duration(milliseconds: 280),
                       curve: Curves.easeOutCubic,
                       style: TextStyle(
-                        fontFamily: 'Satoshi',
+                        fontFamily: AppConstants.satoshi,
                         fontWeight:
                             i == index ? FontWeight.w700 : FontWeight.w500,
                         fontSize: 12,
@@ -354,7 +397,7 @@ class _Profile extends StatelessWidget {
           name,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            fontFamily: 'Geist',
+            fontFamily: AppConstants.geist,
             fontWeight: FontWeight.w700,
             fontSize: 18,
             height: 1.2,
@@ -365,7 +408,7 @@ class _Profile extends StatelessWidget {
         Text(
           birth,
           style: const TextStyle(
-            fontFamily: 'Satoshi',
+            fontFamily: AppConstants.satoshi,
             fontWeight: FontWeight.w500,
             fontSize: 13,
             color: AppColors.textSoft,
@@ -386,7 +429,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       text,
       style: const TextStyle(
-        fontFamily: 'Satoshi',
+        fontFamily: AppConstants.satoshi,
         fontWeight: FontWeight.w500,
         fontSize: 12,
         letterSpacing: 1.6,
@@ -419,7 +462,7 @@ class _FocusRow extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           style: const TextStyle(
-            fontFamily: 'Satoshi',
+            fontFamily: AppConstants.satoshi,
             fontSize: 14,
             height: 1.2,
             color: AppColors.insightCaption,
@@ -432,7 +475,7 @@ class _FocusRow extends StatelessWidget {
             TextSpan(
               text: focus,
               style: const TextStyle(
-                fontFamily: 'Geist',
+                fontFamily: AppConstants.geist,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
@@ -482,7 +525,7 @@ class _HoroscopeCard extends StatelessWidget {
                     const Text(
                       "Your today's horoscope",
                       style: TextStyle(
-                        fontFamily: 'Geist',
+                        fontFamily: AppConstants.geist,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                         height: 1.2,
@@ -493,7 +536,7 @@ class _HoroscopeCard extends StatelessWidget {
                     Text(
                       horoscope.body,
                       style: const TextStyle(
-                        fontFamily: 'Satoshi',
+                        fontFamily: AppConstants.satoshi,
                         fontWeight: FontWeight.w400,
                         fontSize: 13,
                         height: 1.45,
@@ -579,7 +622,7 @@ class _SignTile extends StatelessWidget {
                     title,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w700,
                       fontSize: 13,
                       height: 1.15,
@@ -590,7 +633,7 @@ class _SignTile extends StatelessWidget {
                   Text(
                     '· $value ·',
                     style: const TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
                       color: AppColors.signValue,
@@ -636,7 +679,7 @@ class _FunFactsCard extends StatelessWidget {
                   const Text(
                     'Fun Facts',
                     style: TextStyle(
-                      fontFamily: 'Geist',
+                      fontFamily: AppConstants.geist,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: AppColors.white,
@@ -646,7 +689,7 @@ class _FunFactsCard extends StatelessWidget {
                   Text(
                     text,
                     style: TextStyle(
-                      fontFamily: 'Satoshi',
+                      fontFamily: AppConstants.satoshi,
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
                       height: 1.4,
@@ -715,7 +758,7 @@ class _DestinyBlock extends StatelessWidget {
                         '$number',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'Geist',
+                          fontFamily: AppConstants.geist,
                           fontWeight: FontWeight.w500,
                           fontSize: numberSize,
                           height: 1,
@@ -733,7 +776,7 @@ class _DestinyBlock extends StatelessWidget {
                             'Destiny Number $number',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontFamily: 'Geist',
+                              fontFamily: AppConstants.geist,
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
                               height: 1.2,
@@ -745,7 +788,7 @@ class _DestinyBlock extends StatelessWidget {
                             title,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontFamily: 'Satoshi',
+                              fontFamily: AppConstants.satoshi,
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                               height: 1.2,
@@ -983,7 +1026,7 @@ class _AxisSign extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontFamily: 'Satoshi',
+            fontFamily: AppConstants.satoshi,
             fontWeight: FontWeight.w700,
             fontSize: 14,
             height: 1.05,
@@ -994,7 +1037,7 @@ class _AxisSign extends StatelessWidget {
         Text(
           subtitle,
           style: const TextStyle(
-            fontFamily: 'Satoshi',
+            fontFamily: AppConstants.satoshi,
             fontWeight: FontWeight.w500,
             fontSize: 11,
             height: 1.1,
@@ -1048,7 +1091,7 @@ class _LeoBadge extends StatelessWidget {
         Text(
           'Leo',
           style: TextStyle(
-            fontFamily: 'Satoshi',
+            fontFamily: AppConstants.satoshi,
             fontWeight: FontWeight.w700,
             fontSize: 13,
             height: 1,

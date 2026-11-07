@@ -8,20 +8,20 @@ import '../../../../../core/theme/app_colors.dart';
 
 /// Draws six concentric zodiac timer rings and tangential numbers only.
 class ZodiacTimerPainter extends CustomPainter {
-  ZodiacTimerPainter({
-    required this.config,
-    required this.angles,
-    required this.values,
-  });
+  ZodiacTimerPainter({required this.config, required this.exact});
 
   final ZodiacTimerConfig config;
-  final List<double> angles;
-  final List<int> values;
+
+  /// Continuous ring values: year, month, day, hour, minute, second.
+  final List<double> exact;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = config.center;
     final edges = config.edges;
+
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
 
     // Soft ambient shadow
     canvas.drawCircle(
@@ -65,11 +65,11 @@ class ZodiacTimerPainter extends CustomPainter {
         center,
         config.numberRadius(i),
         spec,
-        angles[i],
-        values[i],
+        exact[i],
         config.scale,
       );
     }
+    canvas.restore();
   }
 
   void _drawNumbers(
@@ -77,22 +77,22 @@ class ZodiacTimerPainter extends CustomPainter {
     Offset center,
     double radius,
     ZodiacRingSpec spec,
-    double angleOffset,
-    int selected,
+    double exact,
     double scale,
   ) {
     final step = (2 * math.pi) / spec.slots;
-    final nearest = (angleOffset / step).round();
-    final residual = angleOffset - nearest * step;
-    final half = (spec.slots / 2).ceil();
+    // The integer on the marker is the current unit for the whole step.
+    final current = exact.floor();
+    final half = (spec.slots / 2).ceil() + 1;
     final tp = TextPainter(textDirection: TextDirection.ltr);
 
     for (var d = -half; d <= half; d++) {
-      final raw = selected + d;
+      final raw = current + d;
       final value =
           spec.min + ((raw - spec.min) % spec.span + spec.span) % spec.span;
-      // Ascending values run along the visible arc (…17,18,19,20,21…)
-      final angle = ZodiacTimerConfig.selectionAngle + d * step + residual;
+      // Positive time moves every numeral clockwise: left to right on this arc.
+      // The upcoming value sits to the left and slides into the marker.
+      final angle = ZodiacTimerConfig.selectionAngle + (exact - raw) * step;
 
       if (angle < -math.pi - 0.35 || angle > 0.55) continue;
 
@@ -147,8 +147,8 @@ class ZodiacTimerPainter extends CustomPainter {
         old.config.ringWidth != config.ringWidth) {
       return true;
     }
-    for (var i = 0; i < angles.length; i++) {
-      if (old.angles[i] != angles[i] || old.values[i] != values[i]) return true;
+    for (var i = 0; i < exact.length; i++) {
+      if (old.exact[i] != exact[i]) return true;
     }
     return false;
   }

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -65,65 +66,110 @@ class HoroscopeCard extends StatelessWidget {
                       ),
                       Positioned(
                         left: 19 * s,
-                        top: 16 * s,
-                        right: 90 * s,
-                        child: Text(
-                          horoscope.sign,
-                          style: TextStyle(
-                            fontFamily: 'Geist',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 26 * s,
-                            height: 1.29,
-                            letterSpacing: 26 * -0.02,
-                            color: AppColors.white,
+                        top: 17 * s,
+                        width: 65 * s,
+                        height: 26 * s,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            horoscope.sign,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                              fontFamily: AppConstants.satoshi,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 20 * s,
+                              height: 1.29,
+                              letterSpacing: 20 * -0.02 * s,
+                              color: AppColors.white,
+                            ),
                           ),
                         ),
                       ),
                       Positioned(
                         left: 19 * s,
-                        top: 50 * s,
-                        child: Text(
-                          horoscope.dateLabel,
-                          style: TextStyle(
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 13 * s,
-                            height: 1.29,
-                            letterSpacing: 13 * -0.02,
-                            color: AppColors.white.withValues(alpha: 0.55),
+                        top: 45 * s,
+                        width: 82 * s,
+                        height: 17 * s,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            horoscope.dateLabel,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                              fontFamily: AppConstants.satoshi,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12 * s,
+                              height: 1.38,
+                              letterSpacing: 12 * -0.02 * s,
+                              color: AppColors.horoscopeDate,
+                            ),
                           ),
                         ),
                       ),
                       Positioned(
                         left: 19 * s,
-                        top: 86 * s,
+                        top: 77 * s,
                         width: 257 * s,
-                        child: Text(
-                          horoscope.body,
-                          maxLines: 4,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14 * s,
-                            height: 1.38,
-                            letterSpacing: 14 * -0.02,
-                            color: AppColors.white,
+                        height: 76 * s,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            horoscope.body,
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: AppConstants.satoshi,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14 * s,
+                              height: 1.38,
+                              letterSpacing: 14 * -0.02 * s,
+                              color: AppColors.white,
+                            ),
                           ),
                         ),
                       ),
                       Positioned(
-                        right: 18 * s,
-                        bottom: 14 * s,
-                        child: Text(
-                          'Read more >',
-                          style: TextStyle(
-                            fontFamily: 'Geist',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13 * s,
-                            letterSpacing: 13 * -0.02,
-                            color: AppColors.goldSoft.withValues(alpha: 0.9),
-                          ),
+                        left: 253 * s,
+                        top: 120 * s,
+                        width: 77 * s,
+                        height: 17 * s,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 0,
+                              width: 66 * s,
+                              height: 17 * s,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Read more',
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12 * s,
+                                    height: 1.4,
+                                    letterSpacing: 12 * -0.01 * s,
+                                    color: AppColors.readMore,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 72 * s,
+                              top: 4 * s,
+                              width: 5 * s,
+                              height: 9 * s,
+                              child: Transform.rotate(
+                                angle: math.pi,
+                                child: CustomPaint(
+                                  painter: _ChevronPainter(AppColors.readMore),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -132,7 +178,7 @@ class HoroscopeCard extends StatelessWidget {
               ),
               // Coin sits on the top edge, inset from the corner so it stays whole.
               Positioned(
-                top: 0,
+                top: -20,
                 right: 16 * s,
                 width: coin,
                 height: coin,
@@ -149,6 +195,34 @@ class HoroscopeCard extends StatelessWidget {
       },
     );
   }
+}
+
+/// Left-pointing chevron. Rotated 180° so it reads as the Read more arrow.
+class _ChevronPainter extends CustomPainter {
+  const _ChevronPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
+    final path =
+        Path()
+          ..moveTo(size.width, 0)
+          ..lineTo(0, size.height / 2)
+          ..lineTo(size.width, size.height);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChevronPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _HoroscopeFxPainter extends CustomPainter {

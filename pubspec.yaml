@@ -70,21 +70,84 @@ flutter:
   assets:
     - assets/images/
     - assets/sounds/
+    - assets/icons/
 
   fonts:
     - family: Geist
       fonts:
-        - asset: assets/fonts/Geist-SemiBold.ttf
+        - asset: assets/fonts/Geist/Geist-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Geist/Geist-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/Geist/Geist-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Geist/Geist-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/Geist/Geist-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Geist/Geist-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Geist/Geist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Geist/Geist-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Geist/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist/Geist-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Geist/Geist-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Geist-Bold.ttf
+        - asset: assets/fonts/Geist/Geist-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Geist/Geist-Bold.ttf
           weight: 700
+        - asset: assets/fonts/Geist/Geist-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Geist/Geist-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Geist/Geist-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/Geist/Geist-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Geist/Geist-BlackItalic.ttf
+          weight: 900
+          style: italic
     - family: Satoshi
       fonts:
-        - asset: assets/fonts/Satoshi-Regular.otf
+        - asset: assets/fonts/Satoshi/Satoshi-Light.otf
+          weight: 300
+        - asset: assets/fonts/Satoshi/Satoshi-LightItalic.otf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Satoshi/Satoshi-Regular.otf
           weight: 400
-        - asset: assets/fonts/Satoshi-Medium.otf
+        - asset: assets/fonts/Satoshi/Satoshi-Italic.otf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Satoshi/Satoshi-Medium.otf
           weight: 500
+        - asset: assets/fonts/Satoshi/Satoshi-MediumItalic.otf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Satoshi/Satoshi-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Satoshi/Satoshi-BoldItalic.otf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Satoshi/Satoshi-Black.otf
+          weight: 900
+        - asset: assets/fonts/Satoshi/Satoshi-BlackItalic.otf
+          weight: 900
+          style: italic
     - family: Arvo
       fonts:
-        - asset: assets/fonts/Arvo-Bold.ttf
+        - asset: assets/fonts/Arvo/Arvo-Bold.ttf
           weight: 700
